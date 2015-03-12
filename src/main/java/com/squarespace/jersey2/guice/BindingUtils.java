@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -190,7 +191,14 @@ class BindingUtils {
    */
   public static boolean isContract(Injectee injectee) {
     Type type = injectee.getRequiredType();
-    return ((Class<?>)type).isAnnotationPresent(Contract.class);
+    final boolean isContract;
+    if (type instanceof ParameterizedType) {
+      ParameterizedType parameterizedType = (ParameterizedType) type;
+      isContract = ((Class) parameterizedType.getRawType()).isAnnotationPresent(Contract.class);
+    } else {
+      isContract = ((Class<?>) type).isAnnotationPresent(Contract.class);
+    }
+    return isContract;
   }
   
   /**
